@@ -108,7 +108,8 @@ CreateThread(function()
     SetWeaponsNoAutoswap(true)
 end)
 
-CreateThread(function()
+--removed for ps-fuel
+--[[CreateThread(function()
     while true do
         local ped = PlayerPedId()
         if IsPedArmed(ped, 7) == 1 and (IsControlJustReleased(0, 24) or IsDisabledControlJustReleased(0, 24)) then
@@ -122,7 +123,29 @@ CreateThread(function()
         end
         Wait(0)
     end
+end)]]
+
+--added for ps-fuel
+CreateThread(function()
+    while true do
+        local ped = PlayerPedId()
+        local idle = 1
+        if (IsPedArmed(ped, 7) == 1 and (IsControlJustReleased(0, 24) or IsDisabledControlJustReleased(0, 24))) or IsPedShooting(PlayerPedId()) then
+            local weapon = GetSelectedPedWeapon(ped)
+            local ammo = GetAmmoInPedWeapon(ped, weapon)
+            if weapon == GetHashKey("WEAPON_PETROLCAN")  then
+                idle = 1000
+            end
+            TriggerServerEvent("weapons:server:UpdateWeaponAmmo", CurrentWeaponData, tonumber(ammo))
+            if MultiplierAmount > 0 then
+                TriggerServerEvent("weapons:server:UpdateWeaponQuality", CurrentWeaponData, MultiplierAmount)
+                MultiplierAmount = 0
+            end
+        end
+        Wait(idle)
+    end
 end)
+--till here
 
 CreateThread(function()
     while true do
